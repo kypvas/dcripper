@@ -21,7 +21,7 @@ DCSync is an attack that abuses the Directory Replication Service (DRS) protocol
 
 The attack mimics a Domain Controller requesting replication data from another DC.
 
-### What We're Building
+### What I Built
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -704,7 +704,7 @@ This shows:
 
 ### 5. Bug Fixes Discovered
 
-During implementation, we found these NDR parsing issues:
+During implementation, I found these NDR parsing issues:
 
 1. **DSNAME null terminator**: The string in DSNAME has a 2-byte null terminator AFTER the string that isn't included in `NameLen`
 
