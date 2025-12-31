@@ -18,7 +18,7 @@ A custom implementation of the MS-DRSR (Directory Replication Service Remote Pro
 - Pure Python implementation of MS-DRSR protocol
 - No Impacket dependency - custom DCE/RPC, NDR, and NTLM implementations
 - Dump single user credentials or all domain users
-- Multiple output formats: hashcat, pwdump, secretsdump, JSON
+- Multiple output formats: hashcat, JSON
 - Supports password and NTLM hash authentication
 - TCP and SMB transport options
 
@@ -58,6 +58,11 @@ python3 dcripper.py -dc 192.168.1.1 -d DOMAIN -u admin -H aad3b435b51404eeaad3b4
 python3 dcripper.py -dc 192.168.1.1 -d DOMAIN -u admin -p Password123 -a -o hashes.txt
 ```
 
+### JSON output format
+```bash
+python3 dcripper.py -dc 192.168.1.1 -d DOMAIN -u admin -p Password123 -f json
+```
+
 ## Options
 
 | Option | Description |
@@ -70,7 +75,7 @@ python3 dcripper.py -dc 192.168.1.1 -d DOMAIN -u admin -p Password123 -a -o hash
 | `-t`, `--target` | Target user to dump (default: krbtgt) |
 | `-a`, `--all` | Dump all domain users |
 | `-o`, `--output` | Output file path |
-| `-f`, `--format` | Output format: `hashcat`, `pwdump`, `secretsdump`, `json` |
+| `-f`, `--format` | Output format: `hashcat` (default), `json` |
 | `--smb` | Use SMB named pipe transport instead of TCP |
 | `--timeout` | Connection timeout in seconds (default: 30) |
 | `-v`, `--verbose` | Verbose output |
@@ -79,27 +84,20 @@ python3 dcripper.py -dc 192.168.1.1 -d DOMAIN -u admin -p Password123 -a -o hash
 
 ### hashcat (default)
 ```
-administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
-```
-
-### pwdump
-```
-DOMAIN\administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
-```
-
-### secretsdump
-```
 DOMAIN\administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
 ```
 
 ### json
 ```json
 {
-  "username": "administrator",
   "domain": "DOMAIN",
+  "username": "administrator",
   "rid": 500,
+  "sid": "S-1-5-21-...",
   "nt_hash": "31d6cfe0d16ae931b73c59d7e0c089c0",
-  "lm_hash": "aad3b435b51404eeaad3b435b51404ee"
+  "user_account_control": 512,
+  "upn": "administrator@domain.local",
+  "spns": []
 }
 ```
 
@@ -120,7 +118,7 @@ For detailed protocol documentation, see [IMPLEMENTATION.md](IMPLEMENTATION.md).
 ## Project Structure
 
 ```
-customsync/
+dcripper/
 ├── dcripper.py           # Main entry point
 ├── config.py             # Configuration and constants
 ├── transport/

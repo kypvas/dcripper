@@ -50,7 +50,7 @@ Examples:
     parser.add_argument("-o", "--output", default="",
                        help="Output file")
     parser.add_argument("-f", "--format", default="hashcat",
-                       choices=["hashcat", "pwdump", "secretsdump", "json"],
+                       choices=["hashcat", "json"],
                        help="Output format (default: hashcat)")
     parser.add_argument("--smb", action="store_true",
                        help="Use SMB named pipe transport instead of TCP")
