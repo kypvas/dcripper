@@ -1,0 +1,5 @@
+# Core dependencies - none required!
+# This tool is designed to work without external dependencies
+# 
+# Optional (for AES decryption if needed):
+# cryptography>=3.0
