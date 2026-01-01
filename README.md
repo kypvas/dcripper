@@ -65,8 +65,8 @@ python3 dcripper.py -dc 192.168.1.1 -d DOMAIN -u admin -p Password123 -a -o hash
 ## Output Format
 
 ```
-DOMAIN\administrator:500:aad3b435b51404eeaad3b435b51404ee:31d6cfe0d16ae931b73c59d7e0c089c0:::
-DOMAIN\krbtgt:502:aad3b435b51404eeaad3b435b51404ee:155f4bc3b5615e06116a605a1d887eaa:::
+DOMAIN\administrator:500:aad3b435b51404eeaad3b435b51404ee:32d6cfe0d17ae931b70c52d7e0c099c0:::
+DOMAIN\krbtgt:502:aad3b435b51404eeaad3b435b51404ee:145f2bc4b5415e04116a604a1d837eaa:::
 ```
 
 ## Protocol Flow
