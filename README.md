@@ -21,7 +21,7 @@ DCRipper performs DCSync attacks by implementing the Windows Directory Replicati
 - Single user or full domain extraction
 - Pass-the-Hash authentication
 - TCP and SMB transport
-- Hashcat-compatible output
+- Hashcat-JSON - output
 
 ## Installation
 
